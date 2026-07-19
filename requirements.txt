@@ -1,1 +1,1 @@
-PySide6>=6.5
+pywebview>=4.4

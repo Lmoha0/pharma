@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Biopharma Tracker</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ================= Sidebar ================= -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">Rx</div>
+      <div>
+        <div class="brand-title">Biopharma</div>
+        <div class="brand-subtitle">Patient & stock tracker</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item active" data-page="patients">
+        <span class="nav-dot"></span> Patients
+      </button>
+      <button class="nav-item" data-page="medicines">
+        <span class="nav-dot"></span> Medicines
+      </button>
+      <button class="nav-item" data-page="dashboard">
+        <span class="nav-dot"></span> Dashboard
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">Local SQLite · runs offline</div>
+  </aside>
+
+  <!-- ================= Content ================= -->
+  <main class="content">
+
+    <!-- ---------- Patients page ---------- -->
+    <section class="page active" id="page-patients">
+      <header class="page-header">
+        <h1>Patients</h1>
+        <p>Search a patient to see their full medicine schedule</p>
+      </header>
+
+      <input type="text" id="patient-search" class="search-input"
+             placeholder="Search patients by name...">
+
+      <div class="split">
+        <div class="col">
+          <h3 class="section-label">All patients</h3>
+          <div class="card table-card">
+            <table>
+              <thead><tr><th>Name</th><th>Phone</th></tr></thead>
+              <tbody id="patient-table-body">
+                <tr class="empty-row"><td colspan="2">No patients yet — add one below</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card form-card">
+            <h3 class="card-title">Add patient</h3>
+            <label>Full name</label>
+            <input type="text" id="new-patient-name" placeholder="e.g. Ahmed Benali">
+            <label>Phone</label>
+            <input type="text" id="new-patient-phone" placeholder="e.g. 0555 12 34 56">
+            <label>Date of birth</label>
+            <input type="date" id="new-patient-dob">
+            <label>Notes</label>
+            <textarea id="new-patient-notes" placeholder="Optional notes..."></textarea>
+            <button class="btn accent" id="add-patient-btn">＋ Add patient</button>
+          </div>
+        </div>
+
+        <div class="col">
+          <h3 class="section-label">Medicines for selected patient</h3>
+          <div class="card table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>Medicine</th><th>Dose</th><th>Every</th>
+                  <th>Last taken</th><th>Next due</th><th>Stock left</th>
+                </tr>
+              </thead>
+              <tbody id="patient-meds-body">
+                <tr class="empty-row"><td colspan="6">Select a patient to see their medicines</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="btn-row">
+            <button class="btn accent" id="mark-taken-btn">✓ Mark selected dose as taken now</button>
+            <button class="btn danger" id="remove-presc-btn">Remove prescription</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- Medicines page ---------- -->
+    <section class="page" id="page-medicines">
+      <header class="page-header">
+        <h1>Medicines</h1>
+        <p>Search a medicine to see stock and who is taking it</p>
+      </header>
+
+      <input type="text" id="medicine-search" class="search-input"
+             placeholder="Search medicines by name...">
+
+      <div class="split">
+        <div class="col">
+          <h3 class="section-label">All medicines</h3>
+          <div class="card table-card">
+            <table>
+              <thead><tr><th>Name</th><th>Stock</th><th>Unit</th></tr></thead>
+              <tbody id="medicine-table-body">
+                <tr class="empty-row"><td colspan="3">No medicines yet — add one below</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card form-card">
+            <h3 class="card-title">Add medicine</h3>
+            <label>Name</label>
+            <input type="text" id="new-med-name" placeholder="e.g. Paracetamol 500mg">
+            <label>Unit</label>
+            <input type="text" id="new-med-unit" placeholder="tablet, ml, capsule...">
+            <label>Initial stock</label>
+            <input type="number" id="new-med-stock" value="0" min="0">
+            <label>Low stock alert below</label>
+            <input type="number" id="new-med-threshold" value="10" min="0">
+            <button class="btn accent" id="add-medicine-btn">＋ Add medicine</button>
+          </div>
+
+          <div class="card form-card">
+            <h3 class="card-title">Update stock (selected medicine)</h3>
+            <label>New quantity</label>
+            <input type="number" id="stock-update-value" value="0" min="0">
+            <button class="btn ghost" id="update-stock-btn">Update stock</button>
+          </div>
+        </div>
+
+        <div class="col">
+          <h3 class="section-label">Patients taking selected medicine</h3>
+          <div class="card table-card">
+            <table>
+              <thead>
+                <tr><th>Patient</th><th>Phone</th><th>Dose</th><th>Last taken</th><th>Next due</th></tr>
+              </thead>
+              <tbody id="medicine-patients-body">
+                <tr class="empty-row"><td colspan="5">Select a medicine to see who takes it</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card form-card">
+            <h3 class="card-title">Prescribe this medicine to a patient</h3>
+            <label>Patient</label>
+            <select id="prescribe-patient-picker"></select>
+            <label>Dose amount</label>
+            <input type="number" id="prescribe-dose" value="1" min="0" step="0.5">
+            <label>Every (hours)</label>
+            <input type="number" id="prescribe-frequency" value="24" min="1">
+            <button class="btn accent" id="prescribe-btn">＋ Prescribe (first dose = now)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- Dashboard page ---------- -->
+    <section class="page" id="page-dashboard">
+      <header class="page-header">
+        <h1>Dashboard</h1>
+        <p>Overview of medicines running low on stock</p>
+      </header>
+
+      <div class="stats-row">
+        <div class="card stat-card">
+          <div class="stat-value" id="stat-patients" style="color:#5b6bd6">0</div>
+          <div class="stat-label">Patients</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value" id="stat-medicines" style="color:#17a692">0</div>
+          <div class="stat-label">Medicines</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value" id="stat-low-stock" style="color:#e6534a">0</div>
+          <div class="stat-label">Low stock alerts</div>
+        </div>
+      </div>
+
+      <h3 class="section-label">Low stock alerts</h3>
+      <div class="card table-card">
+        <table>
+          <thead><tr><th>Medicine</th><th>Stock left</th><th>Alert threshold</th></tr></thead>
+          <tbody id="low-stock-body">
+            <tr class="empty-row"><td colspan="3">Nothing low on stock right now 🎉</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <button class="btn ghost" id="refresh-dashboard-btn" style="margin-top:14px;">↻ Refresh</button>
+    </section>
+
+  </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
